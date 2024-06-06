@@ -1,0 +1,15 @@
+[package]
+name = "auto-marinade-cranker"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+anchor-client = "0.27.0"
+anchor-lang = "0.27.0"
+borsh = "0.9.3"
+solana-client = "1.14.18"
+marinade-client-rs = { git = "https://github.com/marinade-finance/marinade-common-rs-cli" }
+solana-sdk = "1.14.18"
+spl-token = { version = "3.5.0", features = ["no-entrypoint"] }
+spl-associated-token-account  = { version = "1.1.3", features = ["no-entrypoint"] }
+tokio = "1.37.0"
