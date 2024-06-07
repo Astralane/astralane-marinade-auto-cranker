@@ -10,8 +10,8 @@ use std::thread;
 #[tokio::main]
 async fn main(){
     let url="https://api.mainnet-beta.solana.com";
-    //let our_validator=Pubkey::from_str("sShosKd6uA5c1ZpVMxdsE6do13TLRWSMYsXbSMmNC77").unwrap();
-    let our_validator=Pubkey::from_str("NipDoZC37aMQvv2fFq2moUyyiApQxszc7X4mvWHP2pZ").unwrap();
+    let our_validator=Pubkey::from_str("BH7asDZbKkTmT3UWiNfmMVRgQEEpXoVThGPmQfgWwDhg").unwrap();
+  // let our_validator=Pubkey::from_str("NipDoZC37aMQvv2fFq2moUyyiApQxszc7X4mvWHP2pZ").unwrap();
     let mar_prog = Pubkey::from_str("MarBmsSgKXdrN1egZf5sqe1TMai9K1rChYNDJgjq7aD").unwrap();
     let state_pubkey= Pubkey::from_str("8szGkuLTAux9XMgZ2vtY39jVSowEcpBfFfD8hXSEqdGC").unwrap();
     let kp= read_keypair_file("/Users/dev77/Desktop/solana-mainnet/mywallet.json").expect("KEYPAIR NOT FOUND");
@@ -27,15 +27,23 @@ async fn main(){
     );
     let rpc_marinade_client= rpc_marinade_client.expect("cannot connect to rpc");
     let (val, count)=rpc_marinade_client.validator_list().expect("failed to get the validator validator_list");
-    println!("{count}indexes in total");
+    println!("{count} indexes in total");
+    let reserve_balance = rpc_marinade_client.client.get_account(&Pubkey::from_str("Du3Ysj1wKbxPKkuPPnvzQLQh8oMSVifs3jGZjJWXFmHN").unwrap()).unwrap().lamports;
+    let stake_delta = rpc_marinade_client.state.stake_delta(reserve_balance);
+    let total_active_balance = rpc_marinade_client.state.validator_system.total_active_balance;
+    let total_stake_delta = u64::try_from(stake_delta).expect("Stake delta overflow");
+    let total_stake_target = total_active_balance.saturating_add(total_stake_delta);
     for  (pos,validators) in val.iter().enumerate(){
+        // let validator_stake_target = rpc_marinade_client.state.validator_system.validator_stake_target(validators, total_stake_target).unwrap() / 1000000000;
+        // let validator_active_balance=validators.active_balance/1000000000;
+        // if validator_active_balance < validator_stake_target{
+        //      println!("{:?}",validators.validator_account);
+        // }
+       
+
         if validators.validator_account==our_validator{
             //not dependent on my validator
-            let reserve_balance = rpc_marinade_client.client.get_account(&Pubkey::from_str("Du3Ysj1wKbxPKkuPPnvzQLQh8oMSVifs3jGZjJWXFmHN").unwrap()).unwrap().lamports;
-            let stake_delta = rpc_marinade_client.state.stake_delta(reserve_balance);
-            let total_active_balance = rpc_marinade_client.state.validator_system.total_active_balance;
-            let total_stake_delta = u64::try_from(stake_delta).expect("Stake delta overflow");
-            let total_stake_target = total_active_balance.saturating_add(total_stake_delta);
+ 
             let validator_stake_target = rpc_marinade_client.state.validator_system.validator_stake_target(validators, total_stake_target).unwrap() / 1000000000;
             println!("{:?} active balance with position {pos} and stake target {validator_stake_target}",validators.active_balance/1000000000);
             let validator_active_balance=validators.active_balance/1000000000;
@@ -56,7 +64,7 @@ async fn main(){
                 &kp2.pubkey()
             )
             .unwrap()
-            .instruction(ComputeBudgetInstruction::set_compute_unit_price(100))
+            .instruction(ComputeBudgetInstruction::set_compute_unit_price(36000))
             .instruction(ComputeBudgetInstruction::set_compute_unit_limit(100000))
             .signer(&kp2)
             .signer(&stake_account)
@@ -78,6 +86,9 @@ async fn main(){
                 match result {
                     Ok(x) => {
                         println!("{x:#?}");
+                        if x.value.err == None {
+                            break 'timing;
+                        }
                         match x.value.logs{
                             Some(y) => {
                                 let current= y[10].strip_prefix("Program log: Left:").unwrap();
