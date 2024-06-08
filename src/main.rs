@@ -10,7 +10,7 @@ use std::thread;
 #[tokio::main]
 async fn main(){
     let url="https://api.mainnet-beta.solana.com";
-    let our_validator=Pubkey::from_str("BH7asDZbKkTmT3UWiNfmMVRgQEEpXoVThGPmQfgWwDhg").unwrap();
+    let our_validator=Pubkey::from_str("sShosKd6uA5c1ZpVMxdsE6do13TLRWSMYsXbSMmNC77").unwrap();
   // let our_validator=Pubkey::from_str("NipDoZC37aMQvv2fFq2moUyyiApQxszc7X4mvWHP2pZ").unwrap();
     let mar_prog = Pubkey::from_str("MarBmsSgKXdrN1egZf5sqe1TMai9K1rChYNDJgjq7aD").unwrap();
     let state_pubkey= Pubkey::from_str("8szGkuLTAux9XMgZ2vtY39jVSowEcpBfFfD8hXSEqdGC").unwrap();
@@ -85,7 +85,7 @@ async fn main(){
                 let result = rpc_client.simulate_transaction_with_config(&tx, RpcSimulateTransactionConfig{sig_verify: true, ..RpcSimulateTransactionConfig::default()}).await;
                 match result {
                     Ok(x) => {
-                        println!("{x:#?}");
+                        //println!("{x:#?}");
                         if x.value.err == None {
                             break 'timing;
                         }
