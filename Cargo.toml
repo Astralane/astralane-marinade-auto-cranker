@@ -8,6 +8,7 @@ anchor-client = "0.27.0"
 anchor-lang = "0.27.0"
 borsh = "0.9.3"
 solana-client = "1.14.18"
+solana-program = "1.14.18"
 marinade-client-rs = { git = "https://github.com/marinade-finance/marinade-common-rs-cli" }
 solana-sdk = "1.14.18"
 spl-token = { version = "3.5.0", features = ["no-entrypoint"] }
